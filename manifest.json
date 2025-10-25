@@ -1,6 +1,6 @@
 {
   "name": "OneSignal Safe Sender",
-  "short_name": "OSSender",
+  "short_name": "g7-message",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#ffffff",
