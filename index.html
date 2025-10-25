@@ -1,107 +1,58 @@
-<!DOCTYPE html>
-<html lang="ar">
+<!doctype html>
+<html lang="ar" dir="rtl">
 <head>
-  <meta charset="UTF-8">
-  <title>إرسال إشعار - OneSignal</title>
+  <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>OneSignal Safe Sender</title>
+  <meta name="theme-color" content="#0d6efd">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="manifest" href="/manifest.json">
   <style>
-    body { direction: rtl; text-align: right; background-color: #f8f9fa; }
-    .container { max-width: 600px; margin-top: 50px; }
-    #imagePreview { max-width: 100%; margin-top: 10px; display: none; }
+    body{padding-top:30px;background:#f5f7fa}
+    #historyBox{max-height:300px;overflow-y:auto}
   </style>
 </head>
 <body>
-
-<div class="container">
-  <div class="card shadow p-4">
-    <h4 class="mb-4 text-center">إرسال إشعار آمن عبر OneSignal</h4>
-
-    <form id="notifyForm">
-      <div class="mb-3">
-        <label class="form-label">العنوان</label>
-        <input type="text" class="form-control" id="title" required>
+  <div class="container">
+    <div class="row g-4">
+      <!-- نموذج الإرسال -->
+      <div class="col-md-5">
+        <div class="card shadow">
+          <div class="card-header bg-primary text-white">إرسال إشعار</div>
+          <div class="card-body">
+            <form id="notifyForm">
+              <div class="mb-3">
+                <label class="form-label">العنوان</label>
+                <input class="form-control" id="title" required>
+              </div>
+              <div class="mb-3">
+                <label class="form-label">الرسالة</label>
+                <textarea class="form-control" id="message" rows="3" required></textarea>
+              </div>
+              <div class="mb-3">
+                <label class="form-label">صورة (اختياري)</label>
+                <input type="file" class="form-control" id="imageFile" accept="image/*">
+                <img id="imagePreview" class="img-fluid rounded mt-2 d-none">
+              </div>
+              <button class="btn btn-primary w-100">إرسال الإشعار</button>
+            </form>
+          </div>
+        </div>
       </div>
 
-      <div class="mb-3">
-        <label class="form-label">الرسالة</label>
-        <textarea class="form-control" id="message" rows="3" required></textarea>
+      <!-- سجل الإشعارات -->
+      <div class="col-md-7">
+        <div class="card shadow">
+          <div class="card-header bg-secondary text-white">سجل الإشعارات</div>
+          <div class="card-body">
+            <div id="historyBox" class="list-group"></div>
+          </div>
+        </div>
       </div>
-
-      <div class="mb-3">
-        <label class="form-label">اختر صورة (اختياري)</label>
-        <input type="file" class="form-control" id="imageFile" accept="image/*">
-        <img id="imagePreview" class="img-fluid rounded">
-      </div>
-
-      <button type="submit" class="btn btn-primary w-100">إرسال الإشعار</button>
-    </form>
-
-    <div class="mt-3">
-      <pre id="result" class="bg-light p-3" style="display:none;"></pre>
     </div>
   </div>
-</div>
 
-<script>
-  const imageFileInput = document.getElementById('imageFile');
-  const imagePreview = document.getElementById('imagePreview');
-
-  imageFileInput.addEventListener('change', function () {
-    const file = this.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = function (e) {
-        imagePreview.src = e.target.result;
-        imagePreview.style.display = 'block';
-      };
-      reader.readAsDataURL(file);
-    } else {
-      imagePreview.style.display = 'none';
-    }
-  });
-
-  document.getElementById('notifyForm').addEventListener('submit', async function (e) {
-    e.preventDefault();
-
-    const title = document.getElementById('title').value;
-    const message = document.getElementById('message').value;
-    const imageFile = imageFileInput.files[0];
-
-    let imageUrl = null;
-
-    if (imageFile) {
-      const formData = new FormData();
-      formData.append('image', imageFile);
-
-      const imgbbResponse = await fetch('https://api.imgbb.com/1/upload?key=7a2772de77491aa8fb9696a1727062bf', {
-        method: 'POST',
-        body: formData
-      });
-
-      const imgbbData = await imgbbResponse.json();
-      if (imgbbData.success) {
-        imageUrl = imgbbData.data.url;
-      } else {
-        alert('فشل رفع الصورة');
-        return;
-      }
-    }
-
-    const payload = { title, message, imageUrl };
-
-    const response = await fetch('/.netlify/functions/sendNotification', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload)
-    });
-
-    const result = await response.json();
-    const resultBox = document.getElementById('result');
-    resultBox.style.display = 'block';
-    resultBox.textContent = JSON.stringify(result, null, 2);
-  });
-</script>
-
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="/app.js"></script>
 </body>
 </html>
